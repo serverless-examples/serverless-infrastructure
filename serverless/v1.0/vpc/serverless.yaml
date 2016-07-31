@@ -7,6 +7,12 @@ package:
 functions:
     hello:
         handler: src/handler.hello
+        vpc:
+             # as of Aug 2016 - these variables must be set in serverless.env.yaml
+            securityGroupIds:
+                - ${LambdaExecSecurityGroup}
+            subnetIds:
+                - ${SubnetAPrivate}
 
 resources:
     Resources:
@@ -170,3 +176,24 @@ resources:
           Tags:
             - Key: Name
               Value: LambdaExecSecurityGroup
+
+    # Doesn't appear to be supported currently
+    Outputs:
+      VPC:
+        Description: VPC.
+        Value: { Ref: VPC }
+      SubnetAPublic:
+        Description: Subnet A public.
+        Value: { Ref: SubnetAPublic }
+      SubnetAPrivate:
+        Description: Subnet A private.
+        Value: { Ref: SubnetAPrivate }
+      RouteTablePrivate:
+        Description: Route table private.
+        Value: { Ref: RouteTablePrivate }
+      RouteTablePublic:
+        Description: Route table public.
+        Value: { Ref: RouteTablePublic }
+      LambdaExecSecurityGroup:
+        Description: Route table public.
+        Value: { Ref: LambdaExecSecurityGroup }
