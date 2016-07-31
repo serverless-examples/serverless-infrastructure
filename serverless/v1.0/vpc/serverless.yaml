@@ -10,71 +10,6 @@ functions:
 
 resources:
     Resources:
-      IamRoleLambda:
-        Type: AWS::IAM::Role
-        Properties:
-          AssumeRolePolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                - lambda.amazonaws.com
-              Action:
-              - sts:AssumeRole
-          Path: "/"
-
-      IamPolicyLambda:
-        Type: AWS::IAM::Policy
-        Properties:
-          PolicyName: "${stage}-${project}-lambda"
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-            - Effect: Allow
-              Action:
-              - logs:CreateLogGroup
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-              Resource: arn:aws:logs:${region}:*:*
-            - Effect: Allow
-              Action:
-              - ec2:CreateNetworkInterface
-              - ec2:DescribeNetworkInterfaces
-              - ec2:DetachNetworkInterface
-              - ec2:DeleteNetworkInterface
-              Resource: "*"
-          Roles:
-          - Ref: IamRoleLambda
-
-      IamRoleAPIGateway:
-        Type: AWS::IAM::Role
-        Properties:
-          AssumeRolePolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                - apigateway.amazonaws.com
-              Action:
-              - sts:AssumeRole
-          Path: "/"
-
-      IamPolicyAPIGateway:
-        Type: AWS::IAM::Policy
-        Properties:
-          PolicyName: "${stage}-${project}-api-gateway"
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-            - Effect: Allow
-              Action:
-              - lambda:InvokeFunction
-              Resource: "*"
-          Roles:
-          - Ref: IamRoleAPIGateway
-
       VPC:
         Type: AWS::EC2::VPC
         Properties:
@@ -83,22 +18,20 @@ resources:
           EnableDnsHostnames: true
           InstanceTenancy: default
           Tags:
-          - Key: Name
-            Value: 10.0.0.0/16
+            - Key: Name
+              Value: 10.0.0.0/16
       InternetGateway:
         Type: AWS::EC2::InternetGateway
         Properties:
           Tags:
-          - Key: Name
-            Value: 10.0.0.0/16
+            - Key: Name
+              Value: 10.0.0.0/16
 
       VPCGatewayAttachment:
         Type: AWS::EC2::VPCGatewayAttachment
         Properties:
-          VpcId:
-            Ref: VPC
-          InternetGatewayId:
-            Ref: InternetGateway
+          VpcId: { Ref: VPC }
+          InternetGatewayId: { Ref: InternetGateway }
 
       SubnetAPublic:
         Type: AWS::EC2::Subnet
@@ -106,8 +39,7 @@ resources:
           AvailabilityZone: { "Fn::Select": ["0", {"Fn::GetAZs": ""}] }
           CidrBlock: 10.0.0.0/20
           MapPublicIpOnLaunch: true
-          VpcId:
-            Ref: VPC
+          VpcId: { Ref: VPC }
           Tags:
             - Key: Name
               Value: A public
@@ -119,8 +51,7 @@ resources:
         Properties:
           AvailabilityZone: { "Fn::Select": ["0", {"Fn::GetAZs": ""}] }
           CidrBlock: 10.0.16.0/20
-          VpcId:
-            Ref: VPC
+          VpcId: { Ref: VPC }
           Tags:
             - Key: Name
               Value: A private
@@ -130,8 +61,7 @@ resources:
       RouteTablePublic:
         Type: AWS::EC2::RouteTable
         Properties:
-          VpcId:
-            Ref: VPC
+          VpcId: { Ref: VPC }
           Tags:
             - Key: Name
               Value: Public
@@ -139,8 +69,7 @@ resources:
       RouteTablePrivate:
         Type: AWS::EC2::RouteTable
         Properties:
-          VpcId:
-            Ref: VPC
+          VpcId: { Ref: VPC }
           Tags:
             - Key: Name
               Value: Private
@@ -148,34 +77,27 @@ resources:
       RouteTableAssociationAPublic:
         Type: AWS::EC2::SubnetRouteTableAssociation
         Properties:
-          SubnetId:
-            Ref: SubnetAPublic
-          RouteTableId:
-            Ref: RouteTablePublic
+          SubnetId: { Ref: SubnetAPublic }
+          RouteTableId: { Ref: RouteTablePublic }
 
       RouteTableAssociationAPrivate:
         Type: AWS::EC2::SubnetRouteTableAssociation
         Properties:
-          SubnetId:
-            Ref: SubnetAPrivate
-          RouteTableId:
-            Ref: RouteTablePrivate
+          SubnetId: { Ref: SubnetAPrivate }
+          RouteTableId: { Ref: RouteTablePrivate }
 
       RouteTablePublicInternetRoute:
         Type: AWS::EC2::Route
         DependsOn: VPCGatewayAttachment
         Properties:
-          RouteTableId:
-            Ref: RouteTablePublic
+          RouteTableId: { Ref: RouteTablePublic }
           DestinationCidrBlock: 0.0.0.0/0
-          GatewayId:
-            Ref: InternetGateway
+          GatewayId: { Ref: InternetGateway }
 
       NetworkAclPublic:
         Type: AWS::EC2::NetworkAcl
         Properties:
-          VpcId:
-            Ref: VPC
+          VpcId: { Ref: VPC }
           Tags:
             - Key: Name
               Value: Public
@@ -183,8 +105,7 @@ resources:
       NetworkAclPrivate:
         Type: AWS::EC2::NetworkAcl
         Properties:
-          VpcId:
-            Ref: VPC
+          VpcId: { Ref: VPC }
           Tags:
             - Key: Name
               Value: Private
@@ -192,24 +113,19 @@ resources:
       SubnetNetworkAclAssociationAPublic:
         Type: AWS::EC2::SubnetNetworkAclAssociation
         Properties:
-          SubnetId:
-            Ref: SubnetAPublic
-          NetworkAclId:
-            Ref: NetworkAclPublic
+          SubnetId: { Ref: SubnetAPublic }
+          NetworkAclId: { Ref: NetworkAclPublic }
 
       SubnetNetworkAclAssociationAPrivate:
         Type: AWS::EC2::SubnetNetworkAclAssociation
         Properties:
-          SubnetId:
-            Ref: SubnetAPrivate
-          NetworkAclId:
-            Ref: NetworkAclPrivate
+          SubnetId: { Ref: SubnetAPrivate }
+          NetworkAclId: { Ref: NetworkAclPrivate }
 
       NetworkAclEntryInPublicAllowAll:
         Type: AWS::EC2::NetworkAclEntry
         Properties:
-          NetworkAclId:
-            Ref: NetworkAclPublic
+          NetworkAclId: { Ref: NetworkAclPublic }
           RuleNumber: '99'
           Protocol: "-1"
           RuleAction: allow
@@ -219,18 +135,17 @@ resources:
       NetworkAclEntryOutPublicAllowAll:
         Type: AWS::EC2::NetworkAclEntry
         Properties:
-          NetworkAclId:
-            Ref: NetworkAclPublic
+          NetworkAclId: { Ref: NetworkAclPublic }
           RuleNumber: '99'
           Protocol: "-1"
           RuleAction: allow
           Egress: 'true'
           CidrBlock: 0.0.0.0/0
+
       NetworkAclEntryInPrivateAllowVPC:
         Type: AWS::EC2::NetworkAclEntry
         Properties:
-          NetworkAclId:
-            Ref: NetworkAclPrivate
+          NetworkAclId: { Ref: NetworkAclPrivate }
           RuleNumber: '99'
           Protocol: "-1"
           RuleAction: allow
@@ -240,8 +155,7 @@ resources:
       NetworkAclEntryOutPrivateAllowVPC:
         Type: AWS::EC2::NetworkAclEntry
         Properties:
-          NetworkAclId:
-            Ref: NetworkAclPrivate
+          NetworkAclId: { Ref: NetworkAclPrivate }
           RuleNumber: '99'
           Protocol: "-1"
           RuleAction: allow
@@ -252,8 +166,7 @@ resources:
         Type: AWS::EC2::SecurityGroup
         Properties:
           GroupDescription: Lambda functions execute with this group
-          VpcId:
-            Ref: VPC
+          VpcId: { Ref: VPC }
           Tags:
             - Key: Name
               Value: LambdaExecSecurityGroup
