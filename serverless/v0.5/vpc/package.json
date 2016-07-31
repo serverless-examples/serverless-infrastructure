@@ -1,0 +1,13 @@
+{
+  "name": "serverless-infrastructure-vpc",
+  "version": "0.0.1",
+  "description": "A Serverless Example project",
+  "author": "John McKim <johncmckim@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/serverless-examples/serverless-infrastructure"
+  },
+  "dependencies": {}
+}
