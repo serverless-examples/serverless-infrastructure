@@ -3,10 +3,10 @@ Serverless code often needs infrastructure to support it. Whether that is a NoSq
 
 This repository provides examples of creating that infrastructure with Serverless Frameworks.
 
-## Serverless - TODO
+## Serverless
 1. VPC
-2. DynamoDb
-3. Elasticache
+2. DynamoDb - TODO
+3. Elasticache - TODO
 
 ## Apex - TODO
 1. VPC
