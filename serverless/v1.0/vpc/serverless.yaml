@@ -3,12 +3,11 @@ provider:
     name: aws
     runtime: nodejs4.3
     vpc:
-         # as of Aug 2016 - these variables must be set in serverless.env.yaml
         securityGroupIds:
-            - ${lambdaExecSecurityGroup}
+            - ${env:LAMBDA_EXEC_SG}
         subnetIds:
-            - ${subnetAPrivate}
-            - ${subnetBPrivate}
+            - ${env:SUBNET_A_PRIVATE}
+            - ${env:SUBNET_B_PRIVATE}
 functions:
     hello:
         handler: src/handler.hello
